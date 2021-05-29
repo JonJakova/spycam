@@ -15,7 +15,6 @@ import datetime
 class VideoCapture:
 
     def __init__(self, name, classifier):
-        self.last_epoch = 0
         self.email_update_interval = 600  # sends an email only once in this time interval
         self.sender = MailSender()
         self.classifier = classifier
@@ -71,7 +70,7 @@ class VideoCapture:
             if send and (time.time() - last_epoch) > self.email_update_interval:
                 last_epoch = time.time()
                 print("Sending email...")
-                MailSender.sendEmail(frame)
+                self.sender.sendEmail(frame)
                 print("done!")
         except:
             print("Error sending email: "), sys.exc_info()[0]
