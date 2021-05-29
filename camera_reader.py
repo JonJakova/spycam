@@ -4,10 +4,12 @@ import threading
 import time
 import sys
 import smtplib
-import ssl
+from decouple import config
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
 import datetime
+
 
 
 class VideoCapture:
@@ -69,8 +71,7 @@ class VideoCapture:
             if send and (time.time() - last_epoch) > self.email_update_interval:
                 last_epoch = time.time()
                 print("Sending email...")
-                # sendEmail(frame)
-                # self.send_email()
+                MailSender.sendEmail(frame)
                 print("done!")
         except:
             print("Error sending email: "), sys.exc_info()[0]
@@ -78,36 +79,42 @@ class VideoCapture:
 
 class MailSender:
 
-    def sendEmail():
+    def __init__(self):
+        self.username = config('MAIL_USERNAME')
+        self.password = config('MAIL_PASSWORD')
+        self.receiver = config("MAIL_RECEIVER")
+        self.host = config('MAIL_HOST')
+        self.port = config('MAIL_PORT')
+
+    def sendEmail(self, frame=None):
         current_datetime = datetime.datetime.now()
         mail_content = "Movement was detected " + str(current_datetime)
 
-        # IF USING gmail it requires a configuration to allow those certain apps to login
-        # The mail addresses and password
-        sender_address = 'marinmitrovic97@gmail.com'
-        sender_pass = 'xxxxxxxxxxxxxxxxxxxxxxxxx'
-        receiver_address = 'marinmitrovic97@gmail.com'
         # Setup the MIME
         message = MIMEMultipart()
-        message['From'] = sender_address
-        message['To'] = receiver_address
+        message['From'] = self.username
+        message['To'] = self.receiver
         message['Subject'] = 'MOVEMENT WAS DETECTED ALARM! TIME:.' + \
             str(current_datetime)  # The subject line
         # The body and the attachments for the mail
         message.attach(MIMEText(mail_content, 'plain'))
+        
+        if frame is not None:
+            image = MIMEImage(frame, name=current_datetime.microsecond)
+            message.attach(image)
+            
         # Create SMTP session for sending the mail
-        session = smtplib.SMTP('smtp.gmail.com', 587)  # use gmail with port
+        session = smtplib.SMTP(self.host, self.port)
         session.starttls()  # enable security
         # login with mail_id and password
-        session.login(sender_address, sender_pass)
+        session.login(self.username, self.password)
         text = message.as_string()
-        session.sendmail(sender_address, receiver_address, text)
+        session.sendmail(self.username, self.receiver, text)
         session.quit()
-        print('Mail Sent')
 
 
 object_classifier = cv2.CascadeClassifier(
-    "models/fullbody_recognition_model.xml")  # an opencv classifier
+    "models/facial_recognition_model.xml")  # an opencv classifier
 last_epoch = 0
 cap = VideoCapture(0, object_classifier)
 
