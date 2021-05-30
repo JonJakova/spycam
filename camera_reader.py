@@ -14,10 +14,10 @@ import datetime
 
 class VideoCapture:
 
-    def __init__(self, name, classifier):
+    def __init__(self, name, classifiers):
         self.email_update_interval = 600  # sends an email only once in this time interval
         self.sender = MailSender()
-        self.classifier = classifier
+        self.classifiers = classifiers
         self.cap = cv2.VideoCapture(name)
         self.q = queue.Queue()
         t = threading.Thread(target=self._reader)
@@ -36,8 +36,12 @@ class VideoCapture:
                 except queue.Empty:
                     pass
             self.q.put(frame)
-            gen_frame, will_send = self.get_object(self.classifier, frame)
-            self.send_email(gen_frame, will_send)
+            for classifier in self.classifiers:
+                gen_frame, will_send = self.get_object(classifier, frame)
+                if will_send:
+                    self.send_email(gen_frame, will_send)
+                    break
+                    
 
     def read(self):
         return self.q.get()
@@ -112,10 +116,11 @@ class MailSender:
         session.quit()
 
 
-object_classifier = cv2.CascadeClassifier(
-    "models/facial_recognition_model.xml")  # an opencv classifier
+object_classifier_facial = cv2.CascadeClassifier("models/facial_recognition_model.xml")  # an opencv classifier
+object_classifier_upperbody = cv2.CascadeClassifier("models/upperbody_recognition_model.xml")  # an opencv classifier
+object_classifier_fullbody = cv2.CascadeClassifier("models/fullbody_recognition_model.xml")  # an opencv classifier
 last_epoch = 0
-cap = VideoCapture(0, object_classifier)
+cap = VideoCapture(0, [object_classifier_facial, object_classifier_upperbody, object_classifier_fullbody])
 
 while True:
     time.sleep(.5)   # simulate time between events
