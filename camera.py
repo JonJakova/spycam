@@ -15,7 +15,7 @@ import datetime
 class VideoCapture:
 
     def __init__(self, name, classifiers):
-        self.email_update_interval = 600  # sends an email only once in this time interval
+        self.email_update_interval = 100  # sends an email only once in this time interval (seconds)
         self.sender = MailSender()
         self.classifiers = classifiers
         self.cap = cv2.VideoCapture(name)
@@ -103,7 +103,9 @@ class MailSender:
         message.attach(MIMEText(mail_content, 'plain'))
         
         if frame is not None:
-            image = MIMEImage(frame, name=current_datetime.microsecond)
+            # image = MIMEImage(frame, name=current_datetime.microsecond)
+            image = MIMEImage(frame)
+            image.add_header('Content-ID', '<image1>')
             message.attach(image)
             
         # Create SMTP session for sending the mail
