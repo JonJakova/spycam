@@ -16,4 +16,4 @@ Adviced using a virtual envinronment to run
 >- pip install -r requirements.txt
 >- touch .env
 >- fill .env file with data your data (like .env.example)
->- python camera_reader.py
+>- python camera.py
