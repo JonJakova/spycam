@@ -9,7 +9,7 @@ It uses OpenCV to recognize wether a person is been filmed or not.
 
 ### Running
 
-Adviced using a virtual envinronment to run
+Adviced using a virtual environment to run
 
 >- python3 -m venv env
 >- source env/bin/activate
