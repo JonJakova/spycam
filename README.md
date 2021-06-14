@@ -15,5 +15,5 @@ Adviced using a virtual environment to run
 >- source env/bin/activate
 >- pip install -r requirements.txt
 >- touch .env
->- fill .env file with data your data (like .env.example)
+>- fill .env file with your data (like .env.example)
 >- python camera.py
