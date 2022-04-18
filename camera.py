@@ -10,13 +10,15 @@ from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 import datetime
 
+import camera_libs.local_persistency as local_persistency
 
 
 class VideoCapture:
 
     def __init__(self, name, classifiers):
-        self.email_update_interval = 100  # sends an email only once in this time interval (seconds)
+        self.email_update_interval =  int(config('EMAILING_INTERVAL'))  # sends an email only once in this time interval (seconds)
         self.sender = MailSender()
+        self.persistency = local_persistency.Persistency()
         self.classifiers = classifiers
         self.cap = cv2.VideoCapture(name)
         self.q = queue.Queue()
@@ -40,6 +42,7 @@ class VideoCapture:
                 gen_frame, will_send = self.get_object(classifier, frame)
                 if will_send:
                     self.send_email(gen_frame, will_send)
+                    self.persistency.save_image(self._get_image_name(), gen_frame)
                     break
                     
 
@@ -69,15 +72,19 @@ class VideoCapture:
         return (jpeg.tobytes(), found_objects)
 
     def send_email(self, frame, send):
-        global last_epoch
+        global last_epoch_mailing
         try:
-            if send and (time.time() - last_epoch) > self.email_update_interval:
-                last_epoch = time.time()
+            if send and (time.time() - last_epoch_mailing) > self.email_update_interval:
+                last_epoch_mailing = time.time()
                 print("Sending email...")
-                self.sender.sendEmail(frame)
+                self.sender.sendEmail(time.time(), frame)
                 print("done!")
         except:
             print("Error sending email: "), sys.exc_info()[0]
+
+
+    def _get_image_name(self):
+        return 'image_' + str(time.time()) + '.jpg'
 
 
 class MailSender:
@@ -121,7 +128,7 @@ class MailSender:
 object_classifier_facial = cv2.CascadeClassifier("models/facial_recognition_model.xml")  # an opencv classifier
 object_classifier_upperbody = cv2.CascadeClassifier("models/upperbody_recognition_model.xml")  # an opencv classifier
 object_classifier_fullbody = cv2.CascadeClassifier("models/fullbody_recognition_model.xml")  # an opencv classifier
-last_epoch = 0
+last_epoch_mailing = 0
 cap = VideoCapture(0, [object_classifier_facial, object_classifier_upperbody, object_classifier_fullbody])
 
 while True:
