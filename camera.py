@@ -77,7 +77,7 @@ class VideoCapture:
             if send and (time.time() - last_epoch_mailing) > self.email_update_interval:
                 last_epoch_mailing = time.time()
                 print("Sending email...")
-                self.sender.sendEmail(time.time(), frame)
+                self.sender.sendEmail(frame)
                 print("done!")
         except:
             print("Error sending email: "), sys.exc_info()[0]
