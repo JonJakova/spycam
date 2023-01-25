@@ -3,3 +3,4 @@ numpy
 keyboard
 scipy
 python-decouple
+flask
