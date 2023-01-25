@@ -2,12 +2,12 @@
 
 It uses OpenCV to recognize wether a person is been filmed or not.
 
-### Requirements
+## Requirements
 
 >- Python > 3.8
 >- Pip > 21
 
-### Running
+## Running
 
 Adviced using a virtual environment to run
 
@@ -16,4 +16,10 @@ Adviced using a virtual environment to run
 >- pip install -r requirements.txt
 >- touch .env
 >- fill .env file with your data (like .env.example)
->- python camera.py
+>- flask --app api run
+
+## Endpoints
+
+>- /status - GET - Get the status of the camera
+>- /start - POST - Start the camera
+>- /stop - POST - Stop the camera
