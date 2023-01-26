@@ -20,6 +20,6 @@ Adviced using a virtual environment to run
 
 ## Endpoints
 
->- /status - GET - Get the status of the camera
->- /start - POST - Start the camera
->- /stop - POST - Stop the camera
+>- /camera/status - GET - Get the status of the camera
+>- /camera/start - POST - Start the camera
+>- /camera/stop - POST - Stop the camera

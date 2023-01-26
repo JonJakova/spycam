@@ -11,6 +11,8 @@ def camera_status() -> bool:
 
 def start_camera() -> bool:
     global camera
+    if camera is not None:
+        return False
     camera = VideoCapture(0, [object_classifier_facial,
                               object_classifier_upperbody, object_classifier_fullbody])
     return camera_status()
